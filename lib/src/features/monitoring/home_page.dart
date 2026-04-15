@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-// 🔥 VARIABLE GLOBAL
+/// 🔥 GLOBAL STATE
 String namaUser = "";
+double globalTotalKuota = 10;
+double globalSisaKuota = 4;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,11 +15,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    HomeContent(),
-    StatistikPage(),
-    SettingPage(),
-  ];
+  List<Widget> get _pages => [
+        HomeContent(onRefresh: refresh),
+        const StatistikPage(),
+        SettingPage(onSave: refresh),
+      ];
+
+  void refresh() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +39,8 @@ class _HomePageState extends State<HomePage> {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart), label: 'Statistik'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.settings), label: 'Setting'),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Statistik'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
         ],
       ),
     );
@@ -47,11 +51,13 @@ class _HomePageState extends State<HomePage> {
 /// ================= HOME =================
 ////////////////////////////////////////////////////
 class HomeContent extends StatelessWidget {
+  final VoidCallback onRefresh;
+
+  const HomeContent({super.key, required this.onRefresh});
+
   @override
   Widget build(BuildContext context) {
-    double totalKuota = 10;
-    double sisaKuota = 4;
-    double persen = sisaKuota / totalKuota;
+    double persen = globalSisaKuota / globalTotalKuota;
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -65,7 +71,6 @@ class HomeContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔥 NAMA USER MUNCUL DI SINI
             Text(
               namaUser.isEmpty
                   ? "Halo, Selamat Datang!"
@@ -111,7 +116,7 @@ class HomeContent extends StatelessWidget {
                 children: [
                   CircularProgressIndicator(value: persen),
                   const SizedBox(height: 10),
-                  Text("${sisaKuota.toInt()} GB Sisa"),
+                  Text("${globalSisaKuota.toInt()} GB Sisa"),
                 ],
               ),
             ),
@@ -126,6 +131,8 @@ class HomeContent extends StatelessWidget {
 /// ================= STATISTIK =================
 ////////////////////////////////////////////////////
 class StatistikPage extends StatelessWidget {
+  const StatistikPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,7 +140,7 @@ class StatistikPage extends StatelessWidget {
         title: const Text("Statistik"),
         backgroundColor: Colors.blueAccent,
       ),
-      body: const Center(child: Text("Halaman Statistik")),
+      body: const Center(child: Text("Halaman Statistik 📊")),
     );
   }
 }
@@ -142,21 +149,35 @@ class StatistikPage extends StatelessWidget {
 /// ================= SETTING =================
 ////////////////////////////////////////////////////
 class SettingPage extends StatefulWidget {
+  final VoidCallback onSave;
+
+  const SettingPage({super.key, required this.onSave});
+
   @override
   State<SettingPage> createState() => _SettingPageState();
 }
 
 class _SettingPageState extends State<SettingPage> {
   final TextEditingController _namaController = TextEditingController();
+  final TextEditingController _kuotaController = TextEditingController();
 
-  void simpanNama() {
+  void simpanData() {
     setState(() {
       namaUser = _namaController.text;
+
+      double inputKuota =
+          double.tryParse(_kuotaController.text) ?? globalTotalKuota;
+
+      globalTotalKuota = inputKuota;
+      globalSisaKuota = inputKuota;
     });
+
+    widget.onSave(); // 🔥 refresh Home
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Nama disimpan: $namaUser"),
+        content: Text(
+            "Tersimpan! Nama: $namaUser | Kuota: ${globalTotalKuota.toInt()} GB"),
       ),
     );
   }
@@ -164,6 +185,7 @@ class _SettingPageState extends State<SettingPage> {
   @override
   void dispose() {
     _namaController.dispose();
+    _kuotaController.dispose();
     super.dispose();
   }
 
@@ -182,13 +204,32 @@ class _SettingPageState extends State<SettingPage> {
           children: [
             const Text("Nama Pengguna",
                 style: TextStyle(fontWeight: FontWeight.bold)),
-
             const SizedBox(height: 10),
 
             TextField(
               controller: _namaController,
               decoration: InputDecoration(
-                hintText: "Hai, Assalamualaikum",
+                hintText: "Masukkan nama",
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            const Text("Limit Kuota (GB)",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+
+            TextField(
+              controller: _kuotaController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: "Contoh: 20",
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -203,7 +244,7 @@ class _SettingPageState extends State<SettingPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: simpanNama,
+                onPressed: simpanData,
                 child: const Text("Simpan"),
               ),
             ),
