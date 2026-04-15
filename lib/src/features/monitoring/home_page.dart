@@ -22,7 +22,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blueAccent,
@@ -32,18 +31,9 @@ class _HomePageState extends State<HomePage> {
           });
         },
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Statistik',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Setting',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Statistik'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
         ],
       ),
     );
@@ -79,7 +69,6 @@ class HomeContent extends StatelessWidget {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
 
-              // STATUS
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -122,7 +111,6 @@ class HomeContent extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // NAVIGASI
               ListTile(
                 leading: const Icon(Icons.analytics),
                 title: const Text("Cek Detail Jaringan"),
@@ -161,14 +149,11 @@ class StatistikPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Penggunaan Mingguan",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            const Text("Penggunaan Mingguan",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
 
             const SizedBox(height: 20),
 
-            // CHART
             Container(
               height: 250,
               padding: const EdgeInsets.all(15),
@@ -209,10 +194,8 @@ class StatistikPage extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            const Text(
-              "Ringkasan",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            const Text("Ringkasan",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
 
             const SizedBox(height: 15),
 
@@ -247,18 +230,100 @@ class StatistikPage extends StatelessWidget {
 ////////////////////////////////////////////////////
 /// ================= SETTING =================
 ////////////////////////////////////////////////////
-class SettingPage extends StatelessWidget {
+class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
+
+  @override
+  State<SettingPage> createState() => _SettingPageState();
+}
+
+class _SettingPageState extends State<SettingPage> {
+  final TextEditingController _kuotaController = TextEditingController();
+
+  bool isNotificationOn = true;
+  bool isDarkMode = false;
+
+  @override
+  void dispose() {
+    _kuotaController.dispose();
+    super.dispose();
+  }
+
+  void simpanSetting() {
+    String kuota = _kuotaController.text;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Setting disimpan! Limit: $kuota GB"),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text("Pengaturan"),
         backgroundColor: Colors.blueAccent,
       ),
-      body: const Center(
-        child: Text("Setting Page ⚙️"),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Limit Kuota (GB)",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+
+            const SizedBox(height: 10),
+
+            TextField(
+              controller: _kuotaController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: "Masukkan batas kuota",
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            SwitchListTile(
+              title: const Text("Notifikasi Kuota"),
+              value: isNotificationOn,
+              onChanged: (value) {
+                setState(() {
+                  isNotificationOn = value;
+                });
+              },
+            ),
+
+            SwitchListTile(
+              title: const Text("Dark Mode"),
+              value: isDarkMode,
+              onChanged: (value) {
+                setState(() {
+                  isDarkMode = value;
+                });
+              },
+            ),
+
+            const SizedBox(height: 30),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: simpanSetting,
+                child: const Text("Simpan"),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
