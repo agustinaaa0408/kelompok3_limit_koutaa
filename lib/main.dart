@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:limit_kuota/src/features/monitoring/home_page.dart';
 import 'package:limit_kuota/src/features/monitoring/network_page.dart';
 
 void main() {
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false, // Opsional: hilangkan banner debug
-      home: Network(), // Network sekarang punya akses ke Directionality dari MaterialApp
+      home: HomePage(), // tampilan awal sekarang punya akses ke Directionality dari MaterialApp
     );
   }
 }
