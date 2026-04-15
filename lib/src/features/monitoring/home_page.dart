@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+// 🔥 VARIABLE GLOBAL
+String namaUser = "";
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -10,7 +13,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [HomeContent(), StatistikPage(), SettingPage()];
+  final List<Widget> _pages = [
+    HomeContent(),
+    StatistikPage(),
+    SettingPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -27,16 +34,18 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Statistik',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
+              icon: Icon(Icons.bar_chart), label: 'Statistik'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), label: 'Setting'),
         ],
       ),
     );
   }
 }
 
+////////////////////////////////////////////////////
+/// ================= HOME =================
+////////////////////////////////////////////////////
 class HomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -56,9 +65,13 @@ class HomeContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Halo, Selamat Datang!",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            // 🔥 NAMA USER MUNCUL DI SINI
+            Text(
+              namaUser.isEmpty
+                  ? "Halo, Selamat Datang!"
+                  : "Halo, $namaUser 👋",
+              style: const TextStyle(
+                  fontSize: 24, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 20),
@@ -75,17 +88,16 @@ class HomeContent extends StatelessWidget {
                 children: [
                   Icon(Icons.wifi, color: Colors.white, size: 40),
                   SizedBox(width: 10),
-                  Text("Terhubung", style: TextStyle(color: Colors.white)),
+                  Text("Terhubung",
+                      style: TextStyle(color: Colors.white)),
                 ],
               ),
             ),
 
             const SizedBox(height: 30),
 
-            const Text(
-              "Penggunaan Kuota",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            const Text("Penggunaan Kuota",
+                style: TextStyle(fontWeight: FontWeight.bold)),
 
             const SizedBox(height: 10),
 
@@ -126,15 +138,78 @@ class StatistikPage extends StatelessWidget {
   }
 }
 
-class SettingPage extends StatelessWidget {
+////////////////////////////////////////////////////
+/// ================= SETTING =================
+////////////////////////////////////////////////////
+class SettingPage extends StatefulWidget {
+  @override
+  State<SettingPage> createState() => _SettingPageState();
+}
+
+class _SettingPageState extends State<SettingPage> {
+  final TextEditingController _namaController = TextEditingController();
+
+  void simpanNama() {
+    setState(() {
+      namaUser = _namaController.text;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Nama disimpan: $namaUser"),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _namaController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text("Pengaturan"),
         backgroundColor: Colors.blueAccent,
       ),
-      body: const Center(child: Text("Halaman Setting")),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Nama Pengguna",
+                style: TextStyle(fontWeight: FontWeight.bold)),
+
+            const SizedBox(height: 10),
+
+            TextField(
+              controller: _namaController,
+              decoration: InputDecoration(
+                hintText: "Hai, Assalamualaikum",
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: simpanNama,
+                child: const Text("Simpan"),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
