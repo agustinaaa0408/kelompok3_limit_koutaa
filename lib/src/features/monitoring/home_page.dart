@@ -6,9 +6,6 @@ String namaUser = "";
 double globalTotalKuota = 10;
 double globalSisaKuota = 4;
 
-////////////////////////////////////////////////////
-/// MAIN HOME (SUDAH TANPA RIWAYAT)
-////////////////////////////////////////////////////
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -23,18 +20,16 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
-  // ✅ HANYA 2 HALAMAN
   List<Widget> get _pages => [
-        HomeContent(onRefresh: refresh),
-        SettingPage(onSave: refresh),
-      ];
+    HomeContent(onRefresh: refresh),
+    SettingPage(onSave: refresh),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedIndex],
 
-      // ✅ HANYA 2 MENU
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blueAccent,
@@ -48,9 +43,6 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-////////////////////////////////////////////////////
-/// HOME (SUDAH GABUNG RIWAYAT)
-////////////////////////////////////////////////////
 class HomeContent extends StatefulWidget {
   final VoidCallback onRefresh;
 
@@ -67,9 +59,10 @@ class _HomeContentState extends State<HomeContent>
   late AnimationController _controller;
   late Animation<double> _animation;
 
-  // 🔥 DATA RIWAYAT (SIMULASI)
-  final List<double> dataBulanan =
-      List.generate(30, (i) => (i % 5 + 1).toDouble());
+  final List<double> dataBulanan = List.generate(
+    30,
+    (i) => (i % 5 + 1).toDouble(),
+  );
 
   double get total => dataBulanan.reduce((a, b) => a + b);
   double get rataRata => total / dataBulanan.length;
@@ -79,8 +72,10 @@ class _HomeContentState extends State<HomeContent>
     super.initState();
     getDataUsage();
 
-    _controller =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
 
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
 
@@ -120,7 +115,7 @@ class _HomeContentState extends State<HomeContent>
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('KUOTA MONITOR 📶'),
+        title: const Text('KUOTA MONITOR'),
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
       ),
@@ -133,15 +128,16 @@ class _HomeContentState extends State<HomeContent>
               /// 👋 SAPAAN
               Text(
                 namaUser.isEmpty
-                    ? "Halo, Selamat Datang! 😊"
+                    ? "Halo, Selamat Datang!"
                     : "Halo, $namaUser 👋",
-                style:
-                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               const SizedBox(height: 20),
 
-              /// 📊 PROGRESS KUOTA
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -153,8 +149,10 @@ class _HomeContentState extends State<HomeContent>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Pemakaian Kuota",
-                        style: TextStyle(color: Colors.white)),
+                    const Text(
+                      "Pemakaian Kuota",
+                      style: TextStyle(color: Colors.white),
+                    ),
 
                     const SizedBox(height: 10),
 
@@ -162,8 +160,9 @@ class _HomeContentState extends State<HomeContent>
                       value: progress,
                       minHeight: 10,
                       backgroundColor: Colors.white24,
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.white,
+                      ),
                     ),
 
                     const SizedBox(height: 10),
@@ -178,7 +177,6 @@ class _HomeContentState extends State<HomeContent>
 
               const SizedBox(height: 20),
 
-              /// 🔍 DETAIL JARINGAN
               ListTile(
                 leading: const Icon(Icons.analytics),
                 title: const Text("Cek Detail Jaringan"),
@@ -193,7 +191,6 @@ class _HomeContentState extends State<HomeContent>
 
               const SizedBox(height: 20),
 
-              /// 📊 RINGKASAN
               Row(
                 children: [
                   _buildInfoCard(
@@ -214,7 +211,6 @@ class _HomeContentState extends State<HomeContent>
 
               const SizedBox(height: 20),
 
-              /// 📈 CHART RIWAYAT
               const Text(
                 "Riwayat Pemakaian Bulanan 📊",
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -289,8 +285,7 @@ class _HomeContentState extends State<HomeContent>
             Text(title),
             Text(
               value,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ],
         ),
@@ -299,9 +294,6 @@ class _HomeContentState extends State<HomeContent>
   }
 }
 
-////////////////////////////////////////////////////
-/// SETTING
-////////////////////////////////////////////////////
 class SettingPage extends StatefulWidget {
   final VoidCallback onSave;
 
@@ -325,8 +317,9 @@ class _SettingPageState extends State<SettingPage> {
 
     widget.onSave();
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text("Data tersimpan")));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Data tersimpan")));
   }
 
   @override

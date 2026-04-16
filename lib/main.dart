@@ -14,8 +14,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
 
-      debugShowCheckedModeBanner: false, // Opsional: hilangkan banner debug
-      home: SplashScreen(), // tampilan awal sekarang punya akses ke Directionality dari MaterialApp
+      debugShowCheckedModeBanner: false, 
+      home: SplashScreen(),
     );
   }
 }
