@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart'; // Import intl untuk format tanggal
-import 'package:limit_kuota/src/core/data/database_helper.dart'; // Import Database Helper
+import 'package:intl/intl.dart'; 
+import 'package:limit_kuota/src/core/data/database_helper.dart'; 
 import 'package:limit_kuota/src/core/services/intent_helper.dart';
-import 'package:limit_kuota/src/features/monitoring/history_page.dart'; // Import History Page
+import 'package:limit_kuota/src/features/monitoring/history_page.dart'; 
 
 class Network extends StatefulWidget {
   const Network({super.key});
@@ -20,26 +20,20 @@ class _NetworkState extends State<Network> {
 
   Future<void> fetchUsage() async {
     try {
-      // Sekarang result adalah Map
       final Map<dynamic, dynamic> result = await platform.invokeMethod(
         'getTodayUsage',
       );
 
-      // --- LOGIKA PENYIMPANAN KE SQLITE ---
-      // Ambil tanggal hari ini dalam format YYYY-MM-DD
       String todayDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-      // Ambil nilai integer (raw bytes) dari result
       int wifiBytes = result['wifi'] ?? 0;
       int mobileBytes = result['mobile'] ?? 0;
 
-      // Simpan ke database (akan update jika tanggal hari ini sudah ada)
       await DatabaseHelper.instance.insertOrUpdate(
         todayDate,
         wifiBytes,
         mobileBytes,
       );
-      // ------------------------------------
 
       setState(() {
         wifiUsage = _formatBytes(result['wifi']);
@@ -62,7 +56,6 @@ class _NetworkState extends State<Network> {
   }
 
   Future<void> checkLimitAndWarn(int currentUsage) async {
-    // 1024 MB dalam Bytes
     int limitInBytes = 1024 * 1024 * 1024;
 
     if (currentUsage >= limitInBytes) {
@@ -105,7 +98,6 @@ class _NetworkState extends State<Network> {
       appBar: AppBar(
         title: const Text('Monitoring Data'),
         actions: [
-          // Tombol untuk menuju halaman History
           IconButton(
             icon: const Icon(Icons.history),
             onPressed: () {
@@ -167,7 +159,7 @@ class _NetworkState extends State<Network> {
   void _showPermissionDialog() {
     showDialog(
       context: context,
-      barrierDismissible: false, // User harus menekan tombol
+      barrierDismissible: false, 
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Izin Diperlukan"),
@@ -183,8 +175,6 @@ class _NetworkState extends State<Network> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                // Memanggil kembali fetchUsage akan memicu Kotlin
-                // untuk membuka halaman pengaturan lagi
                 fetchUsage();
               },
               child: const Text("Buka Pengaturan"),
