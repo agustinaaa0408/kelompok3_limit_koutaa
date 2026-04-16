@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:limit_kuota/src/features/monitoring/network_page.dart'; // ✅ TAMBAHAN
 
 String namaUser = "";
 double globalTotalKuota = 10;
@@ -46,9 +47,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-////////////////////////////////////////////////////
-/// HOME CONTENT
-////////////////////////////////////////////////////
+
 class HomeContent extends StatefulWidget {
   final VoidCallback onRefresh;
 
@@ -172,6 +171,21 @@ class _HomeContentState extends State<HomeContent> {
                 ],
               ),
             ),
+
+            
+            const SizedBox(height: 30),
+
+            ListTile(
+              leading: const Icon(Icons.analytics),
+              title: const Text("Cek Detail Jaringan"),
+              trailing: const Icon(Icons.arrow_forward),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const Network()),
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -179,9 +193,7 @@ class _HomeContentState extends State<HomeContent> {
   }
 }
 
-////////////////////////////////////////////////////
-/// STATISTIK
-////////////////////////////////////////////////////
+
 class StatistikPage extends StatelessWidget {
   const StatistikPage({super.key});
 
@@ -194,9 +206,7 @@ class StatistikPage extends StatelessWidget {
   }
 }
 
-////////////////////////////////////////////////////
-/// SETTING
-////////////////////////////////////////////////////
+
 class SettingPage extends StatefulWidget {
   final VoidCallback onSave;
 
