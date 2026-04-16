@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 String namaUser = "";
 double globalTotalKuota = 10;
 double globalSisaKuota = 4;
@@ -15,15 +14,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
+  void refresh() {
+    setState(() {});
+  }
+
   List<Widget> get _pages => [
         HomeContent(onRefresh: refresh),
         const StatistikPage(),
         SettingPage(onSave: refresh),
       ];
-
-  void refresh() {
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +46,9 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-
+////////////////////////////////////////////////////
+/// HOME CONTENT
+////////////////////////////////////////////////////
 class HomeContent extends StatefulWidget {
   final VoidCallback onRefresh;
 
@@ -67,18 +68,29 @@ class _HomeContentState extends State<HomeContent> {
   }
 
   Future<void> getDataUsage() async {
-    // SIMULASI dulu (karena akses real cukup kompleks)
     await Future.delayed(const Duration(seconds: 1));
 
     setState(() {
-      usedData = 2.5; // contoh 2.5 GB terpakai
+      usedData = 2.5;
       globalSisaKuota = globalTotalKuota - usedData;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    double persen = globalSisaKuota / globalTotalKuota;
+    double terpakai = globalTotalKuota - globalSisaKuota;
+
+    double progress =
+        globalTotalKuota == 0 ? 0 : terpakai / globalTotalKuota;
+
+    Color warnaProgress;
+    if (progress < 0.5) {
+      warnaProgress = Colors.green;
+    } else if (progress < 0.8) {
+      warnaProgress = Colors.orange;
+    } else {
+      warnaProgress = Colors.red;
+    }
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -99,7 +111,6 @@ class _HomeContentState extends State<HomeContent> {
               style: const TextStyle(
                   fontSize: 24, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 20),
 
             Container(
@@ -134,10 +145,30 @@ class _HomeContentState extends State<HomeContent> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircularProgressIndicator(value: persen),
+                  const Text("Pemakaian Kuota",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+
+                  const SizedBox(height: 15),
+
+                  LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 12,
+                    backgroundColor: Colors.grey.shade300,
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(warnaProgress),
+                  ),
+
                   const SizedBox(height: 10),
-                  Text("${globalSisaKuota.toInt()} GB Sisa"),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("${terpakai.toStringAsFixed(1)} GB terpakai"),
+                      Text("${globalSisaKuota.toStringAsFixed(1)} GB sisa"),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -148,22 +179,24 @@ class _HomeContentState extends State<HomeContent> {
   }
 }
 
+////////////////////////////////////////////////////
+/// STATISTIK
+////////////////////////////////////////////////////
 class StatistikPage extends StatelessWidget {
   const StatistikPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Statistik"),
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: const Center(child: Text("Halaman Statistik 📊")),
+      appBar: AppBar(title: const Text("Statistik")),
+      body: const Center(child: Text("Halaman Statistik")),
     );
   }
 }
 
-
+////////////////////////////////////////////////////
+/// SETTING
+////////////////////////////////////////////////////
 class SettingPage extends StatefulWidget {
   final VoidCallback onSave;
 
@@ -180,90 +213,29 @@ class _SettingPageState extends State<SettingPage> {
   void simpanData() {
     setState(() {
       namaUser = _namaController.text;
-
-      double inputKuota =
+      globalTotalKuota =
           double.tryParse(_kuotaController.text) ?? globalTotalKuota;
-
-      globalTotalKuota = inputKuota;
-      globalSisaKuota = inputKuota;
+      globalSisaKuota = globalTotalKuota;
     });
 
-    widget.onSave(); 
+    widget.onSave();
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-            "Tersimpan! Nama: $namaUser | Kuota: ${globalTotalKuota.toInt()} GB"),
-      ),
+      const SnackBar(content: Text("Data tersimpan")),
     );
-  }
-
-  @override
-  void dispose() {
-    _namaController.dispose();
-    _kuotaController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text("Pengaturan"),
-        backgroundColor: Colors.blueAccent,
-      ),
+      appBar: AppBar(title: const Text("Pengaturan")),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Nama Pengguna",
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-
-            TextField(
-              controller: _namaController,
-              decoration: InputDecoration(
-                hintText: "Masukkan nama",
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            const Text("Limit Kuota (GB)",
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-
-            TextField(
-              controller: _kuotaController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: "Contoh: 20",
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: simpanData,
-                child: const Text("Simpan"),
-              ),
-            ),
+            TextField(controller: _namaController),
+            TextField(controller: _kuotaController),
+            ElevatedButton(onPressed: simpanData, child: const Text("Simpan"))
           ],
         ),
       ),
