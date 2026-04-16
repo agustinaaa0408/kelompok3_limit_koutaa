@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// 🔥 GLOBAL STATE
+
 String namaUser = "";
 double globalTotalKuota = 10;
 double globalSisaKuota = 4;
@@ -47,13 +47,34 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-////////////////////////////////////////////////////
-/// ================= HOME =================
-////////////////////////////////////////////////////
-class HomeContent extends StatelessWidget {
+
+class HomeContent extends StatefulWidget {
   final VoidCallback onRefresh;
 
   const HomeContent({super.key, required this.onRefresh});
+
+  @override
+  State<HomeContent> createState() => _HomeContentState();
+}
+
+class _HomeContentState extends State<HomeContent> {
+  double usedData = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getDataUsage();
+  }
+
+  Future<void> getDataUsage() async {
+    // SIMULASI dulu (karena akses real cukup kompleks)
+    await Future.delayed(const Duration(seconds: 1));
+
+    setState(() {
+      usedData = 2.5; // contoh 2.5 GB terpakai
+      globalSisaKuota = globalTotalKuota - usedData;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,9 +148,6 @@ class HomeContent extends StatelessWidget {
   }
 }
 
-////////////////////////////////////////////////////
-/// ================= STATISTIK =================
-////////////////////////////////////////////////////
 class StatistikPage extends StatelessWidget {
   const StatistikPage({super.key});
 
@@ -145,9 +163,7 @@ class StatistikPage extends StatelessWidget {
   }
 }
 
-////////////////////////////////////////////////////
-/// ================= SETTING =================
-////////////////////////////////////////////////////
+
 class SettingPage extends StatefulWidget {
   final VoidCallback onSave;
 
@@ -172,7 +188,7 @@ class _SettingPageState extends State<SettingPage> {
       globalSisaKuota = inputKuota;
     });
 
-    widget.onSave(); // 🔥 refresh Home
+    widget.onSave(); 
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
